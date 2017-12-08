@@ -73,8 +73,7 @@ function Star(size, top) {
 		ctx.strokeStyle = 'orange'; 
 		ctx.fillStyle = 'yellow'; 
 		if (top) {
-			drawStar(0,0,5,size*2,size);
-			// ctx.arc(0, 0, size, 0, 2*Math.PI);
+			drawStar(0,0,5,size*1.5,size/2);
 		} else {
 			if (random(1,20) < 19) { // blinking			
 				ctx.arc(0, 0, size, 0, 2*Math.PI);
@@ -97,9 +96,17 @@ function Branch(size, rotation, main) {
 	if(main) {
 		firstBranch = false;
 		if(size>10) {
+			// stem continues
+			this.children.push(new Branch(size*random(0.8,0.9), random(-3,3), main)); 
+
+			//branches to the sides
 			this.children.push(new Branch(size*random(0.5,0.6), random(60,70), false)); 
 			this.children.push(new Branch(size*random(0.5,0.6), random(-60,-70), false)); 
-			this.children.push(new Branch(size*random(0.8,0.9), random(-3,3), main)); 
+
+			//branches in front and back
+			this.children.push(new Branch(size*random(0.4,0.5), random(-20,30), false)); 
+			this.children.push(new Branch(size*random(0.4,0.5), random(-30,20), false)); 
+
 		} else {
 			// the top
 			this.children.push(new Star(size*1.5, true)); 
@@ -109,9 +116,14 @@ function Branch(size, rotation, main) {
 			this.children.push(new Branch(size*random(0.4,0.6), random(60,70), false)); 
 			this.children.push(new Branch(size*random(0.4,0.6), random(-60,-70), false)); 
 			this.children.push(new Branch(size*random(0.65,0.8), random(-3,3), main)); 
+
+			//branches in front and back
+			this.children.push(new Branch(size*random(0.3,0.4), random(-20,30), false)); 
+			this.children.push(new Branch(size*random(0.3,0.4), random(-30,20), false)); 
+			
 		} else {
 			// light
-			if (random(1,10) < 4) { // only somewhere
+			if (random(1,20) < 4) { // only somewhere
 				this.children.push(new Star(2, false)); 
 			}
 		}
