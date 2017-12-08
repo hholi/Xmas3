@@ -23,6 +23,7 @@ canvas.height = window.innerHeight;
 
 var ctx = canvas.getContext('2d'); 
 var generation = 0; 
+var firstBranch = true;
 
 var tree = new Branch(100); 
 
@@ -46,10 +47,21 @@ function Branch(size, rotation) {
 	var delay = generation*10; 
 	
 	this.children = [];
-	if(size>10) {
-		this.children.push(new Branch(size*random(0.7,0.9), random(0,30))); 
-		this.children.push(new Branch(size*random(0.7,0.9), random(0,-30))); 
+	if(firstBranch) {
+		firstBranch = false;
+		if(size>10) {
+			this.children.push(new Branch(size*random(0.5,0.7), random(60,70))); 
+			this.children.push(new Branch(size*random(0.5,0.7), random(-60,-70))); 
+			this.children.push(new Branch(size*random(0.7,0.93), random(-5,5))); 
+		}
+	} else {
+		if(size>10) {
+			this.children.push(new Branch(size*random(0.5,0.7), random(60,70))); 
+			this.children.push(new Branch(size*random(0.5,0.7), random(-60,-70))); 
+			this.children.push(new Branch(size*random(0.7,0.93), random(-5,5))); 
+		}
 	}
+
 	
 	this.render = function() { 
 
@@ -60,12 +72,16 @@ function Branch(size, rotation) {
 		ctx.lineWidth = size*0.1*growth;
 		ctx.moveTo(0,0); 
 		ctx.lineTo(0,-size*growth);
-		ctx.stroke(); 
-		ctx.beginPath(); 
-		ctx.strokeStyle = 'yellow'; 
-		ctx.arc(0, -size*growth, 2, 0, 2*Math.PI);
-		ctx.stroke(); 
-		ctx.closePath(); 
+		ctx.stroke();
+		if(size < 8) { // only ligths in small branches
+			if (random(1,10) > 2) { // blinking
+				ctx.beginPath(); 
+				ctx.strokeStyle = 'yellow'; 
+				ctx.arc(0, -size*growth, 2, 0, 2*Math.PI);
+				ctx.stroke(); 
+				ctx.closePath(); 
+			}
+		}
 		ctx.translate(0,-size*growth); 
 		ctx.strokeStyle = 'green'; 
 		
