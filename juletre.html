@@ -39,11 +39,47 @@ function draw() {
 	window.requestAnimationFrame(draw); 
 }
 
-function Star(size) { 
+function drawStar(cx,cy,spikes,outerRadius,innerRadius){
+      var rot=Math.PI/2*3;
+      var x=cx;
+      var y=cy;
+      var step=Math.PI/spikes;
+
+      ctx.beginPath();
+      ctx.moveTo(cx,cy-outerRadius)
+      for(i=0;i<spikes;i++){
+        x=cx+Math.cos(rot)*outerRadius;
+        y=cy+Math.sin(rot)*outerRadius;
+        ctx.lineTo(x,y)
+        rot+=step
+
+        x=cx+Math.cos(rot)*innerRadius;
+        y=cy+Math.sin(rot)*innerRadius;
+        ctx.lineTo(x,y)
+        rot+=step
+      }
+      ctx.lineTo(cx,cy-outerRadius);
+      ctx.closePath();
+      ctx.lineWidth=5;
+      ctx.strokeStyle='gold';
+      ctx.stroke();
+      ctx.fillStyle='yellow';
+      ctx.fill();
+    }
+
+function Star(size, top) { 
 	this.render = function() { 
 		ctx.beginPath(); 
-		ctx.strokeStyle = 'yellow'; 
-		ctx.arc(0, 0, 10, 0, 2*Math.PI);
+		ctx.strokeStyle = 'orange'; 
+		ctx.fillStyle = 'yellow'; 
+		if (top) {
+			drawStar(0,0,5,size*2,size);
+			// ctx.arc(0, 0, size, 0, 2*Math.PI);
+		} else {
+			if (random(1,20) < 19) { // blinking			
+				ctx.arc(0, 0, size, 0, 2*Math.PI);
+			}
+		}
 		ctx.fill();  
 		ctx.stroke();
 		ctx.closePath(); 			
@@ -53,7 +89,7 @@ function Star(size) {
 function Branch(size, rotation, main) { 
 	generation++; 
 	var sway = 0; 
-	var swaySpeed = random(0.02,0.1); 
+	var swaySpeed = random(0.01,0.04); 
 	var growth = 0; 
 	var delay = generation*10; 
 	
@@ -63,16 +99,21 @@ function Branch(size, rotation, main) {
 		if(size>10) {
 			this.children.push(new Branch(size*random(0.5,0.6), random(60,70), false)); 
 			this.children.push(new Branch(size*random(0.5,0.6), random(-60,-70), false)); 
-			this.children.push(new Branch(size*random(0.7,0.9), random(-5,5), main)); 
+			this.children.push(new Branch(size*random(0.8,0.9), random(-3,3), main)); 
 		} else {
 			// the top
-			this.children.push(new Star(10)); 
+			this.children.push(new Star(size*1.5, true)); 
 		}
 	} else {
 		if(size>10) {
-			this.children.push(new Branch(size*random(0.4,0.7), random(60,70), false)); 
-			this.children.push(new Branch(size*random(0.4,0.7), random(-60,-70), false)); 
-			this.children.push(new Branch(size*random(0.65,0.8), random(-5,5), main)); 
+			this.children.push(new Branch(size*random(0.4,0.6), random(60,70), false)); 
+			this.children.push(new Branch(size*random(0.4,0.6), random(-60,-70), false)); 
+			this.children.push(new Branch(size*random(0.65,0.8), random(-3,3), main)); 
+		} else {
+			// light
+			if (random(1,10) < 4) { // only somewhere
+				this.children.push(new Star(2, false)); 
+			}
 		}
 	}
 
@@ -81,23 +122,23 @@ function Branch(size, rotation, main) {
 
 		ctx.save(); 
 		ctx.rotate((rotation+Math.sin(sway)) * Math.PI/180); 
-		ctx.strokeStyle = 'green'; 
+		ctx.strokeStyle = 'ForestGreen'; 
 		ctx.beginPath(); 
 		ctx.lineWidth = size*0.1*growth;
 		ctx.moveTo(0,0); 
 		ctx.lineTo(0,-size*growth);
 		ctx.stroke();
-		if(size < 8) { // only ligths in small branches
-			if (random(1,10) < 9) { // blinking
-				ctx.beginPath(); 
-				ctx.strokeStyle = 'yellow'; 
-				ctx.arc(0, -size*growth, 2, 0, 2*Math.PI);
-				ctx.stroke(); 
-				ctx.closePath(); 
-			}
-		}
+		// if(size < 8) { // only ligths in small branches
+		// 	if (random(1,10) < 9) { // blinking
+		// 		ctx.beginPath(); 
+		// 		ctx.strokeStyle = 'yellow'; 
+		// 		ctx.arc(0, -size*growth, 2, 0, 2*Math.PI);
+		// 		ctx.stroke(); 
+		// 		ctx.closePath(); 
+		// 	}
+		// }
 		ctx.translate(0,-size*growth); 
-		ctx.strokeStyle = 'green'; 
+		ctx.strokeStyle = 'ForestGreen'; 
 		
 		for(var i = 0; i<this.children.length; i++) { 
 			this.children[i].render(); 
