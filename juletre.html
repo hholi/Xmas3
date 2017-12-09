@@ -90,24 +90,24 @@ function Branch(size, rotation, stem, generation, absdirection) {
 	generation = generation + 1; 
 	var sway = 0; 
 	var swaySpeed = random(0.005,0.02); 
-	var growth = 0; 
+	var growth = 0; // <- set to 0 if to see it grow
 	var delay = generation*10; 
 
 	// modify rotation to go after the light
 	if (absdirection < -10) {
-		rotation = rotation + 10
+		rotation = rotation + 4
 	}
 	if (absdirection > 10) {
-		rotation = rotation - 10
+		rotation = rotation - 4
 	}
-	var absdirection = absdirection + rotation
+	absdirection = absdirection + rotation
 
 	this.children = [];
 
 	if(size>10) {
 		if (stem) {
 			// stem continues
-			this.children.push(new Branch(size*random(0.85,0.9), random(-2,2), stem, generation, absdirection)); 
+			this.children.push(new Branch(size*random(0.83,0.91), random(-2,2), stem, generation, absdirection)); 
 
 			//branches in front and back
 			this.children.push(new Branch(size*random(0.4,0.5), random(-30,30), false, generation, absdirection)); 
@@ -118,8 +118,8 @@ function Branch(size, rotation, stem, generation, absdirection) {
 		}
 
 		//branches to the sides
-		this.children.push(new Branch(size*random(0.63,0.68), random(55,70), false, generation, absdirection)); 
-		this.children.push(new Branch(size*random(0.63,0.68), random(-55,-70), false, generation, absdirection)); 
+		this.children.push(new Branch(size*random(0.53,0.62), random(55,70), false, generation, absdirection)); 
+		this.children.push(new Branch(size*random(0.53,0.62), random(-55,-70), false, generation, absdirection)); 
 
 
 	} else {
@@ -129,7 +129,7 @@ function Branch(size, rotation, stem, generation, absdirection) {
 			this.children.push(new Star(size*1.5, true)); 
 		} else {
 			// small lights
-			if (random(1,20) < 2) { // only somewhere
+			if (random(1,20) < 3) { // only somewhere
 				this.children.push(new Star(2, false)); 
 			}
 		}
@@ -142,13 +142,13 @@ function Branch(size, rotation, stem, generation, absdirection) {
 		ctx.rotate((rotation+Math.sin(sway)) * Math.PI/180); 
 		ctx.beginPath(); 
 		ctx.lineWidth = size*0.13*growth;
-		if (ctx.lineWidth > 5) {
-			ctx.strokeStyle = 'Sienna'; 
-		} else {
-			ctx.strokeStyle = 'OliveDrab'; 
-		}
+		ctx.strokeStyle = 'Sienna'; 
 		ctx.moveTo(0,0); 
 		ctx.lineTo(0,-size*growth);
+		ctx.stroke();
+		if(ctx.lineWidth < 5) {
+			needles(size*growth);
+		}
 		ctx.stroke();
 
 		ctx.translate(0,-size*growth); 
@@ -172,6 +172,20 @@ function Branch(size, rotation, stem, generation, absdirection) {
 
 	}
 
+}
+
+function needles(length) {
+	ctx.beginPath(); 
+	ctx.strokeStyle = 'OliveDrab'; 
+	ctx.lineWidth = 0.7;
+	for(var y = 0; y < length; y = y+3) {
+		ctx.moveTo( 0, -y); 
+		ctx.lineTo(-3, -y-6);		
+		ctx.moveTo( 0, -y); 
+		ctx.lineTo( 3, -y-6);		
+		ctx.moveTo( 0, -y); 
+		ctx.lineTo( 0, -y-8);		
+	}
 }
 
 function random(min, max) { 
