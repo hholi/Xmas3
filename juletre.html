@@ -2,18 +2,16 @@
 <html lang="en"> 
 <meta charset="utf-8"> 
 	<head>
-	<title>Christmas tree</title>
-	<style type="text/css"> 
-		body { 
-			background-color:black; 
-			margin:0px; 
-			overflow : hidden; 
-		}
+		<title>Christmas tree</title>
+		<style type="text/css"> 
+			body { 
+				background-color:black; 
+				margin:0px; 
+				overflow : hidden; 
+			}
 		</style> 
 	</head>
-	
 	<body>
-	
 		<script>
 
 // Based on swaying tree by Seb Lee-Delisle
@@ -25,9 +23,8 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight; 
 
 var ctx = canvas.getContext('2d'); 
-var generation = 0; 
 
-var tree = new Branch(100, 0, true); 
+var tree = new Branch(100, 0, true, 0); 
 
 draw(); 
 
@@ -42,32 +39,32 @@ function draw() {
 }
 
 function drawStar(cx,cy,spikes,outerRadius,innerRadius){
-      var rot=Math.PI/2*3;
-      var x=cx;
-      var y=cy;
-      var step=Math.PI/spikes;
+	var rot=Math.PI/2*3;
+	var x=cx;
+	var y=cy;
+	var step=Math.PI/spikes;
 
-      ctx.beginPath();
-      ctx.moveTo(cx,cy-outerRadius)
-      for(i=0;i<spikes;i++){
-        x=cx+Math.cos(rot)*outerRadius;
-        y=cy+Math.sin(rot)*outerRadius;
-        ctx.lineTo(x,y)
-        rot+=step
+	ctx.beginPath();
+	ctx.moveTo(cx,cy-outerRadius)
+	for(i=0;i<spikes;i++){
+		x=cx+Math.cos(rot)*outerRadius;
+		y=cy+Math.sin(rot)*outerRadius;
+		ctx.lineTo(x,y);
+		rot+=step;
 
-        x=cx+Math.cos(rot)*innerRadius;
-        y=cy+Math.sin(rot)*innerRadius;
-        ctx.lineTo(x,y)
-        rot+=step
-      }
-      ctx.lineTo(cx,cy-outerRadius);
-      ctx.closePath();
-      ctx.lineWidth=2;
-      ctx.strokeStyle='gold';
-      ctx.stroke();
-      ctx.fillStyle='yellow';
-      ctx.fill();
-    }
+		x=cx+Math.cos(rot)*innerRadius;
+		y=cy+Math.sin(rot)*innerRadius;
+		ctx.lineTo(x,y);
+		rot+=step;
+	}
+	ctx.lineTo(cx,cy-outerRadius);
+	ctx.closePath();
+	ctx.lineWidth=2;
+	ctx.strokeStyle='gold';
+	ctx.stroke();
+	ctx.fillStyle='yellow';
+	ctx.fill();
+}
 
 function Star(size, top) { 
 	this.render = function() { 
@@ -77,7 +74,7 @@ function Star(size, top) {
 		if (top) {
 			drawStar(0,0,5,size*1.5,size/2);
 		} else {
-			if (random(1,20) < 19) { // blinking			
+			if (random(1,20) < 19) { // twinkle			
 				ctx.arc(0, 0, size, 0, 2*Math.PI);
 			}
 		}
@@ -87,44 +84,40 @@ function Star(size, top) {
 	}
 }
 
-function Branch(size, rotation, stem) { 
-	generation++; 
+function Branch(size, rotation, stem, generation) { 
+	generation = generation + 1; 
 	var sway = 0; 
 	var swaySpeed = random(0.005,0.02); 
 	var growth = 0; 
 	var delay = generation*10; 
 	
 	this.children = [];
-	if(stem) {
-		if(size>10) {
+
+	if(size>10) {
+		if (stem) {
 			// stem continues
-			this.children.push(new Branch(size*random(0.85,0.9), random(-3,3), stem)); 
-
-			//branches to the sides
-			this.children.push(new Branch(size*random(0.6,0.7), random(60,70), false)); 
-			this.children.push(new Branch(size*random(0.6,0.7), random(-60,-70), false)); 
+			this.children.push(new Branch(size*random(0.85,0.9), random(-3,3), stem, generation)); 
 
 			//branches in front and back
-			this.children.push(new Branch(size*random(0.4,0.5), random(-20,30), false)); 
-			this.children.push(new Branch(size*random(0.4,0.5), random(-30,20), false)); 
-
+			this.children.push(new Branch(size*random(0.4,0.5), random(-30,30), false, generation)); 
+			this.children.push(new Branch(size*random(0.1,0.3), random(110,250), false, generation)); 
 		} else {
-			// the top
-			this.children.push(new Star(size*1.5, true)); 
+			this.children.push(new Branch(size*random(0.70,0.85), random(-3,3), stem, generation)); 
 		}
-	} else { // side branches
-		if(size > 10) {
-			this.children.push(new Branch(size*random(0.4,0.6), random(60,70), false)); 
-			this.children.push(new Branch(size*random(0.4,0.6), random(-50,-60), false)); 
-			this.children.push(new Branch(size*random(0.70,0.85), random(-3,3), stem)); 
 
-			//branches in front and back
-			this.children.push(new Branch(size*random(0.4,0.5), random(-20,30), false)); 
-			this.children.push(new Branch(size*random(0.4,0.5), random(-30,20), false)); 
-			
+		//branches to the sides
+		this.children.push(new Branch(size*random(0.6,0.7), random(60,70), false, generation)); 
+		this.children.push(new Branch(size*random(0.6,0.7), random(-60,-70), false, generation)); 
+
+
+	} else {
+		// Lights in the ends
+		if(stem) {
+			// Star in the top
+			this.children.push(new Star(size*1.5, true)); 
 		} else {
-			// light
-			if (random(1,20) < 4) { // only somewhere
+			// small lights
+			if (random(1,20) < 2) { // only somewhere
 				this.children.push(new Star(2, false)); 
 			}
 		}
@@ -135,19 +128,18 @@ function Branch(size, rotation, stem) {
 
 		ctx.save(); 
 		ctx.rotate((rotation+Math.sin(sway)) * Math.PI/180); 
-		if (size > 60) {
+		ctx.beginPath(); 
+		ctx.lineWidth = size*0.13*growth;
+		if (ctx.lineWidth > 5) {
 			ctx.strokeStyle = 'Sienna'; 
 		} else {
 			ctx.strokeStyle = 'OliveDrab'; 
 		}
-		ctx.beginPath(); 
-		ctx.lineWidth = size*0.13*growth;
 		ctx.moveTo(0,0); 
 		ctx.lineTo(0,-size*growth);
 		ctx.stroke();
 
 		ctx.translate(0,-size*growth); 
-		ctx.strokeStyle = 'ForestGreen'; 
 		
 		for(var i = 0; i<this.children.length; i++) { 
 			this.children[i].render(); 
@@ -170,11 +162,6 @@ function random(min, max) {
 	
 }
 
-
 		</script>			
-	</body>
-	
-	
+	</body>	
 </html>
-
-
