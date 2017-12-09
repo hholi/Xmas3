@@ -23,7 +23,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight; 
 
 var ctx = canvas.getContext('2d'); 
-
+var xmas = false
 var tree = new Branch(100, 0, true, 0); 
 
 draw(); 
@@ -68,19 +68,21 @@ function drawStar(cx,cy,spikes,outerRadius,innerRadius){
 
 function Star(size, top) { 
 	this.render = function() { 
-		ctx.beginPath(); 
-		ctx.strokeStyle = 'orange'; 
-		ctx.fillStyle = 'yellow'; 
-		if (top) {
-			drawStar(0,0,5,size*1.5,size/2);
-		} else {
-			if (random(1,20) < 19) { // twinkle			
-				ctx.arc(0, 0, size, 0, 2*Math.PI);
+		if (xmas) {
+			ctx.beginPath(); 
+			ctx.strokeStyle = 'orange'; 
+			ctx.fillStyle = 'yellow'; 
+			if (top) {
+				drawStar(0,0,5,size*1.5,size/2);
+			} else {
+				if (random(1,20) < 19) { // twinkle			
+					ctx.arc(0, 0, size, 0, 2*Math.PI);
+				}
 			}
+			ctx.fill();  
+			ctx.stroke();
+			ctx.closePath(); 			
 		}
-		ctx.fill();  
-		ctx.stroke();
-		ctx.closePath(); 			
 	}
 }
 
@@ -96,18 +98,19 @@ function Branch(size, rotation, stem, generation) {
 	if(size>10) {
 		if (stem) {
 			// stem continues
-			this.children.push(new Branch(size*random(0.85,0.9), random(-3,3), stem, generation)); 
+			this.children.push(new Branch(size*random(0.85,0.9), random(-2,2), stem, generation)); 
 
 			//branches in front and back
 			this.children.push(new Branch(size*random(0.4,0.5), random(-30,30), false, generation)); 
-			this.children.push(new Branch(size*random(0.1,0.3), random(110,250), false, generation)); 
+			this.children.push(new Branch(size*random(0.2,0.3), random(110,250), false, generation)); 
 		} else {
-			this.children.push(new Branch(size*random(0.70,0.85), random(-3,3), stem, generation)); 
+			// branch continues after junction
+			this.children.push(new Branch(size*random(0.70,0.85), random(-10,10), stem, generation)); 
 		}
 
 		//branches to the sides
-		this.children.push(new Branch(size*random(0.6,0.7), random(60,70), false, generation)); 
-		this.children.push(new Branch(size*random(0.6,0.7), random(-60,-70), false, generation)); 
+		this.children.push(new Branch(size*random(0.63,0.68), random(55,70), false, generation)); 
+		this.children.push(new Branch(size*random(0.63,0.68), random(-55,-70), false, generation)); 
 
 
 	} else {
@@ -152,9 +155,14 @@ function Branch(size, rotation, stem, generation) {
 		} else { 
 			growth+=(1-growth) * 0.1; 
 		}
+
+		// Is it Christmas??
+		if (growth > 0.99999) {
+			xmas = true
+		}
+
 	}
-	generation--; 
-	
+
 }
 
 function random(min, max) { 
